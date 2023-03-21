@@ -23,7 +23,13 @@ let GraphqlFilterModule = GraphqlFilterModule_1 = class GraphqlFilterModule {
                     useClass: adapter,
                 },
             ],
-            exports: [graphql_filter_service_1.GraphqlFilterService],
+            exports: [
+                graphql_filter_service_1.GraphqlFilterService,
+                {
+                    provide: types_1.GraphqlFilterAdapter,
+                    useClass: adapter,
+                },
+            ],
             global: true,
         };
     }

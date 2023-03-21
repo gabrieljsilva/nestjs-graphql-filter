@@ -16,7 +16,13 @@ export class GraphqlFilterModule {
           useClass: adapter,
         },
       ],
-      exports: [GraphqlFilterService],
+      exports: [
+        GraphqlFilterService,
+        {
+          provide: GraphqlFilterAdapter,
+          useClass: adapter,
+        },
+      ],
       global: true,
     };
   }
