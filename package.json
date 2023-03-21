@@ -19,7 +19,7 @@
     "prerelease": "npm version prerelease --preid=rc"
   },
   "optionalDependencies": {
-    "@gabrieljsilva/nestjs-graphql-filter-adapter-prisma": "^0.0.1"
+    "@gabrieljsilva/nestjs-graphql-filter-adapter-prisma": "^0.1.0-rc.2"
   },
   "dependencies": {
     "@nestjs/common": "^9.3.10",
