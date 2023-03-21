@@ -1,7 +1,6 @@
 import { Global, Injectable, Inject } from '@nestjs/common';
 import { GraphqlFilterAdapter, FilterOperations } from '../../types';
 
-@Global()
 @Injectable()
 export class GraphqlFilterService {
   constructor(
