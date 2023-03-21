@@ -1,6 +1,6 @@
 {
   "name": "@gabrieljsilva/nestjs-graphql-filter",
-  "version": "0.0.2-rc.7",
+  "version": "0.0.3-rc.0",
   "description": "Generate filters for Nestjs GraphQL package based on decorators",
   "author": "gabrieljsilva",
   "private": false,
