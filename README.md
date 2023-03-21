@@ -1,7 +1,7 @@
 # @gabrieljsilva/nestjs-graphql-filter
-Crie filtros para suas aplicações com Nest.js e GraphQL usando decorators.
+Create filters for your applications with Nest.js and GraphQL using decorators.
 
-## Instalação
+## Installation
 
 ```sh
 npm i @gabrieljsilva/nestjs-graphql-filter
@@ -11,9 +11,9 @@ or
 yarn add @gabrieljsilva/nestjs-graphql-filter
 ```
 
-Adicione o módulo `GraphqlFilterModule` ao módulo raiz da sua aplicação Nest.js e também o adapter do banco de dados que usar.
+Add the `GraphqlFilterModule` module to the root module of your Nest.js application and also the database adapter you use.
 
-No exemplo abaixo estou usando o adapter do [Prisma ORM](@gabrieljsilva/nestjs-graphql-filter-adapter-prisma).
+In the example below I am using the [Prisma ORM](@gabrieljsilva/nestjs-graphql-filter-adapter-prisma) adapter.
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -37,7 +37,7 @@ import { GraphqlModule } from './infra/graphql';
 export class AppModule {}
 ```
 
-Após registrado, é possível injetar o `GraphqlFilterService` nos módulos da aplicação.
+After registered, it is possible to inject the `GraphqlFilterService` in the application modules.
 Ex:
 
 ```typescript
@@ -52,8 +52,8 @@ export class UserService {
 }
 ```
 
-Agora é possível gerar as queries do seu banco de dados ou ORM, utilizando o método 'getQuery' em GraphqlFilterService.
-Como mostrado no exemplo abaixo, usando o PrismaORM como exemplo.
+Now it is possible to generate queries from your database or ORM, using the 'getQuery' method in GraphqlFilterService.
+As shown in the example below, using PrismaORM as an example.
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -82,7 +82,7 @@ export class UserService {
 ```
 
 ## Utils
-É possível abstrair a criação das queries usando decorators e pipes.
+It is possible to abstract the creation of queries using decorators and pipes.
 
 Ex:
 
@@ -103,7 +103,7 @@ export class TransformFilterArgsPipe implements PipeTransform {
 }
 ```
 
-Após isso crie o decorator para criar a query.
+After that create the decorator to create the query.
 
 Ex:
 `filter-args.decorator.ts`
@@ -128,7 +128,7 @@ export const FilterArgs = (
 };
 ```
 
-Agora podemos criar usá-la em uma query.
+Now we can create and use it in a GraphQL query.
 
 Ex:
 
