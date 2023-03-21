@@ -1,73 +1,81 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# @gabrieljsilva/nestjs-graphql-filter
+Crie filtros para suas aplicações com Nest.js e GraphQL usando decorators.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Instalação
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ npm install
+```sh
+npm i @gabrieljsilva/nestjs-graphql-filter
+```
+or
+```sh
+yarn add @gabrieljsilva/nestjs-graphql-filter
 ```
 
-## Running the app
+Adicione o módulo `GraphqlFilterModule` ao módulo raiz da sua aplicação Nest.js e também o adapter do banco de dados que usar.
 
-```bash
-# development
-$ npm run start
+No exemplo abaixo estou usando o adapter do [Prisma ORM](@gabrieljsilva/nestjs-graphql-filter-adapter-prisma).
 
-# watch mode
-$ npm run start:dev
+```typescript
+import { Module } from '@nestjs/common';
+import { PrismaModule } from '@prisma/module/prisma.module';
+import { UserModule } from './packages';
+import { GraphqlModule } from './infra/graphql';
+import { GraphqlFilterModule } from '@gabrieljsilva/nestjs-graphql-filter';
+import { PrismaFilterAdapter } from '@gabrieljsilva/nestjs-graphql-filter-adapter-prisma';
 
-# production mode
-$ npm run start:prod
+@Module({
+  imports: [
+    GraphqlFilterModule.forRoot(PrismaFilterAdapter),
+    GraphqlModule,
+    PrismaModule,
+    UserModule,
+  ],
+  controllers: [],
+  providers: [],
+})
+export class AppModule {}
 ```
 
-## Test
+Após registrado, é possível injetar o `GraphqlFilterService` nos módulos da aplicação.
+Ex:
 
-```bash
-# unit tests
-$ npm run apenasUmTeste
+```typescript
+import { Injectable } from '@nestjs/common';
+import { GraphqlFilterService } from '@gabrieljsilva/nestjs-graphql-filter';
 
-# e2e tests
-$ npm run apenasUmTeste:e2e
-
-# apenasUmTeste coverage
-$ npm run apenasUmTeste:cov
+@Injectable()
+export class UserService {
+  constructor(
+    private readonly graphqlFilterService: GraphqlFilterService,
+  ) {}
+}
 ```
 
-## Support
+Agora é possível gerar as queries do seu banco de dados ou ORM, utilizando o método 'getQuery' em GraphqlFilterService.
+Como mostrado no exemplo abaixo, usando o PrismaORM como exemplo.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```typescript
+import { Injectable } from '@nestjs/common';
+import { GraphqlFilterService } from '@gabrieljsilva/nestjs-graphql-filter';
+import { Prisma } from '@prisma/client';
 
-## Stay in touch
+import { PrismaService } from '@prisma/module/prisma.service';
+import { UserFilters } from '../../../../domain/filterables';
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+@Injectable()
+export class UserService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly graphqlFilterService: GraphqlFilterService,
+  ) {}
 
-## License
+  async getManyUsers(filters?: UserFilters) {
+    const findUsersFilters =
+      this.graphqlFilterService.getQuery<Prisma.UserWhereInput>(filters);
 
-Nest is [MIT licensed](LICENSE).
+    return this.prisma.user.findMany({
+      where: findUsersFilters,
+    });
+  }
+}
+```
