@@ -11,21 +11,19 @@ exports.GraphqlFilterModule = void 0;
 const common_1 = require("@nestjs/common");
 const graphql_filter_service_1 = require("./graphql-filter.service");
 const types_1 = require("../../types");
-const pipes_1 = require("../../pipes");
 let GraphqlFilterModule = GraphqlFilterModule_1 = class GraphqlFilterModule {
     static forRoot(adapter) {
         return {
             module: GraphqlFilterModule_1,
             imports: [],
             providers: [
-                pipes_1.FilterPipe,
                 graphql_filter_service_1.GraphqlFilterService,
                 {
                     provide: types_1.GraphqlFilterAdapter,
                     useClass: adapter,
                 },
             ],
-            exports: [graphql_filter_service_1.GraphqlFilterService, pipes_1.FilterPipe],
+            exports: [graphql_filter_service_1.GraphqlFilterService],
             global: true,
         };
     }
