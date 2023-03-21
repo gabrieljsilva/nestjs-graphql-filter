@@ -17,11 +17,12 @@ No exemplo abaixo estou usando o adapter do [Prisma ORM](@gabrieljsilva/nestjs-g
 
 ```typescript
 import { Module } from '@nestjs/common';
+import { GraphqlFilterModule } from '@gabrieljsilva/nestjs-graphql-filter';
+import { PrismaFilterAdapter } from '@gabrieljsilva/nestjs-graphql-filter-adapter-prisma';
+
 import { PrismaModule } from '@prisma/module/prisma.module';
 import { UserModule } from './packages';
 import { GraphqlModule } from './infra/graphql';
-import { GraphqlFilterModule } from '@gabrieljsilva/nestjs-graphql-filter';
-import { PrismaFilterAdapter } from '@gabrieljsilva/nestjs-graphql-filter-adapter-prisma';
 
 @Module({
   imports: [
@@ -76,6 +77,74 @@ export class UserService {
     return this.prisma.user.findMany({
       where: findUsersFilters,
     });
+  }
+}
+```
+
+## Utils
+É possível abstrair a criação das queries usando decorators e pipes.
+
+Ex:
+
+`transform-filter-args.pipe.ts`
+```typescript
+import { Inject, PipeTransform } from '@nestjs/common';
+import { GraphqlFilterService } from '@gabrieljsilva/nestjs-graphql-filter';
+
+export class TransformFilterArgsPipe implements PipeTransform {
+  constructor(
+    @Inject(GraphqlFilterService)
+    private readonly graphqlFilterService: GraphqlFilterService,
+  ) {}
+
+  transform(value: any) {
+    return this.graphqlFilterService.getQuery(value);
+  }
+}
+```
+
+Após isso crie o decorator para criar a query.
+
+Ex:
+`filter-args.decorator.ts`
+```typescript
+import { Type } from '@nestjs/common';
+import { Args, ArgsOptions } from '@nestjs/graphql';
+
+import { TransformFilterArgsPipe } from '../../pipes';
+
+export const FilterArgs = (
+  property: string,
+  type: Type,
+  options?: Omit<ArgsOptions, 'type'>,
+) => {
+  return (target: Record<string, unknown>, key: string, index: number) => {
+    Args(property, { type: () => type, ...options }, TransformFilterArgsPipe)(
+      target,
+      key,
+      index,
+    );
+  };
+};
+```
+
+Agora podemos criar usá-la em uma query.
+
+Ex:
+
+```typescript
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
+export class UserService {
+  constructor(private readonly userService: UserService) {}
+  
+  @Query(() => UserPaginated)
+  getManyUsers(
+    @Args('pagination') paginationInput: PaginationInput,
+    @FilterArgs('filters', UserFilters) filter: Prisma.UserWhereInput,
+  ): Promise<UserPaginated> {
+    return this.userService.getManyUsers(paginationInput, filter);
   }
 }
 ```
