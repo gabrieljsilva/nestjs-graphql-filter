@@ -1,0 +1,1 @@
+{"version":3,"file":"json-adapter.d.ts","sourceRoot":"","sources":["../../../src/adapters/json-adapter/json-adapter.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,gBAAgB,EAAE,oBAAoB,EAAE,MAAM,aAAa,CAAC;AAErE,qBAAa,WAAY,SAAQ,oBAAoB;IACnD,QAAQ,CAAC,MAAM,GAAG,GAAG,EAAE,CAAC,GAAG,GAAG,EAAE,MAAM,EAAE,gBAAgB,CAAC,CAAC,CAAC,GAAG,MAAM;CAGrE"}
